@@ -1,4 +1,4 @@
-package example
+package us3
 
 import (
 	"github.com/beyondstorage/go-storage/v4/services"
