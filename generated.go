@@ -68,25 +68,47 @@ func setStorageSystemMetadata(s *StorageMeta, sm StorageSystemMetadata) {
 	s.SetSystemMetadata(sm)
 }
 
+// WithDefaultStoragePairs will apply default_storage_pairs value to Options.
+//
+// DefaultStoragePairs set default pairs for storager actions
+func WithDefaultStoragePairs(v DefaultStoragePairs) Pair {
+	return Pair{
+		Key:   "default_storage_pairs",
+		Value: v,
+	}
+}
+
+// WithStorageFeatures will apply storage_features value to Options.
+//
+// StorageFeatures set storage features
+func WithStorageFeatures(v StorageFeatures) Pair {
+	return Pair{
+		Key:   "storage_features",
+		Value: v,
+	}
+}
+
 var pairMap = map[string]string{
-	"content_md5":         "string",
-	"content_type":        "string",
-	"context":             "context.Context",
-	"continuation_token":  "string",
-	"credential":          "string",
-	"endpoint":            "string",
-	"expire":              "time.Duration",
-	"http_client_options": "*httpclient.Options",
-	"interceptor":         "Interceptor",
-	"io_callback":         "func([]byte)",
-	"list_mode":           "ListMode",
-	"location":            "string",
-	"multipart_id":        "string",
-	"name":                "string",
-	"object_mode":         "ObjectMode",
-	"offset":              "int64",
-	"size":                "int64",
-	"work_dir":            "string",
+	"content_md5":           "string",
+	"content_type":          "string",
+	"context":               "context.Context",
+	"continuation_token":    "string",
+	"credential":            "string",
+	"default_storage_pairs": "DefaultStoragePairs",
+	"endpoint":              "string",
+	"expire":                "time.Duration",
+	"http_client_options":   "*httpclient.Options",
+	"interceptor":           "Interceptor",
+	"io_callback":           "func([]byte)",
+	"list_mode":             "ListMode",
+	"location":              "string",
+	"multipart_id":          "string",
+	"name":                  "string",
+	"object_mode":           "ObjectMode",
+	"offset":                "int64",
+	"size":                  "int64",
+	"storage_features":      "StorageFeatures",
+	"work_dir":              "string",
 }
 var (
 	_ Storager = &Storage{}
@@ -101,6 +123,10 @@ type pairStorageNew struct {
 
 	// Required pairs
 	// Optional pairs
+	HasDefaultStoragePairs bool
+	DefaultStoragePairs    DefaultStoragePairs
+	HasStorageFeatures     bool
+	StorageFeatures        StorageFeatures
 	// Enable features
 	// Default pairs
 }
@@ -115,8 +141,20 @@ func parsePairStorageNew(opts []Pair) (pairStorageNew, error) {
 		switch v.Key {
 		// Required pairs
 		// Optional pairs
-		// Enable features
-		// Default pairs
+		case "default_storage_pairs":
+			if result.HasDefaultStoragePairs {
+				continue
+			}
+			result.HasDefaultStoragePairs = true
+			result.DefaultStoragePairs = v.Value.(DefaultStoragePairs)
+		case "storage_features":
+			if result.HasStorageFeatures {
+				continue
+			}
+			result.HasStorageFeatures = true
+			result.StorageFeatures = v.Value.(StorageFeatures)
+			// Enable features
+			// Default pairs
 		}
 	}
 
